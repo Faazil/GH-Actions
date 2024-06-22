@@ -3,8 +3,8 @@ name: My Basic Workflow
 
 # This section defines when the workflow will be triggered. Here, it runs on push events.
 # You can use other events like pull_request or schedule (for cron jobs)
-on:
-  push: main
+on: push
+  
 
 # This section defines the jobs within the workflow. A job can have multiple steps.
 jobs:
