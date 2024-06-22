@@ -1,0 +1,52 @@
+# This line defines the workflow name (displayed in GitHub Actions UI)
+name: My Feature-Rich Workflow
+
+# This section defines when the workflow will be triggered. Here, it runs on push events to the main branch.
+on:
+  push:
+    branches: [ main ]
+
+# This section defines the jobs within the workflow.
+jobs:
+  build-and-test:  # Name of the job (displayed in GitHub Actions UI)
+    runs-on: ubuntu-latest  # This defines the runner OS (e.g., ubuntu-latest, macos-monterey)
+
+    # This section defines the steps within the job. Each step executes a command.
+    steps:
+      - uses: actions/checkout@v3  # This pre-defined action checks out the repository code
+        with:
+          fetch-depth: 0  # Fetches all commits from history (optional)
+
+      - name: Install dependencies  # Descriptive name for the step (optional)
+        run: npm install  # Command to run within the step
+
+      - name: Run tests  # Descriptive name for the step (optional)
+        run: npm test  # Command to run within the step
+
+  # This job builds and deploys the application
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test  # This job depends on the successful completion of build-and-test job
+
+    steps:
+      - uses: actions/checkout@v3  # Checkout code
+
+      - name: Build the application  # Descriptive name for the step
+        run: npm run build  # Example build command (replace with your build command)
+
+      - name: Deploy to production  # Descriptive name for the step
+        # Add steps to deploy your application to production (e.g., using AWS CodeDeploy)
+
+  # This job runs static code analysis 
+  static-code-analysis:
+    runs-on: ubuntu-latest
+    needs: build-and-test  # This job depends on the successful completion of build-and-test job
+
+    steps:
+      - uses: actions/checkout@v3  # Checkout code
+
+      - name: Install code analysis tool  # Descriptive name for the step
+        run: npm install eslint  # Example code analysis tool installation (replace with your tool)
+
+      - name: Run code analysis  # Descriptive name for the step
+        run: npm run lint  # Example code analysis command (replace with your command)
