@@ -4,7 +4,7 @@ name: My Feature-Rich Workflow
 # This section defines when the workflow will be triggered. Here, it runs on push events to the main branch.
 on:
   push:
-    branches: [ main ]
+    branches: main
 
 # This section defines the jobs within the workflow.
 jobs:
