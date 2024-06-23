@@ -1,25 +1,29 @@
-# This line defines the workflow name (displayed in GitHub Actions UI)
-name: My Basic Workflow
+name: AEM Deployment
 
-# This section defines when the workflow will be triggered. Here, it runs on push events.
-# You can use other events like pull_request or schedule (for cron jobs)
-on: push
-  
+on:
+  push:
+    branches: main
 
-# This section defines the jobs within the workflow. A job can have multiple steps.
 jobs:
-  build:  # Name of the job (displayed in GitHub Actions UI)
-    runs-on: ubuntu-latest  # This defines the runner OS (e.g., ubuntu-latest, macos-monterey)
-
-    # This section defines the steps within the job. Each step executes a command.
+  deploy:
+    runs-on: ubuntu-latest  # Adjust the runner OS if needed
     steps:
-      - uses: actions/checkout@v3  # This pre-defined action checks out the repository code
-        with:
-          # This defines additional options for the action (optional)
-          fetch-depth: 0  # Fetches all commits from history (optional)
+      - uses: actions/checkout@v3  # Checkout your repository code
 
-      - name: Install dependencies  # Descriptive name for the step (optional)
-        run: date
+      - name: Download AEM package (optional)
+       
+         uses: actions/download-artifact@v3
+         with:
+           name: aem-package.zip
+           path: .
 
-      - name: Run tests  # Descriptive name for the step (optional)
-        run: uname -r
+      - name: Upload AEM package
+        run: |
+          curl -u ${{ secrets.AEM_CREDENTIALS }} \
+            -F cmd=upload \
+            -F force=true \
+            -F package=@we.retail.community.apps-1.11.84.zip \
+            http://<your_aem_host>:4502/crx/packmgr/service/.json
+        env:
+          AEM_HOST: ${{ secrets.AEM_HOST }}  # Add a secret for AEM host
+
