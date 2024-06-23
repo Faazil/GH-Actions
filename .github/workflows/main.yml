@@ -14,7 +14,7 @@ jobs:
         # Uncomment if your package isn't already in the repository:
         uses: actions/download-artifact@v3
         with:
-          name: aem-package.zip
+          name: ${{ secrets.AEM_PACKAGE_NAME }}
           path: .
 
       - name: Upload AEM package
