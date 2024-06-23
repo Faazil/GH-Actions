@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Adjust the runner OS if needed
+    runs-on: aem  # Adjust the runner OS if needed
     steps:
       - uses: actions/checkout@v3  # Checkout your repository code
 
