@@ -26,4 +26,3 @@ jobs:
             http://<your_aem_host>:4502/crx/packmgr/service/.json
         env:
           AEM_HOST: ${{ secrets.AEM_HOST }}  # Add a secret for AEM host
-
