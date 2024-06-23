@@ -8,13 +8,13 @@ jobs:
   deploy:
     runs-on: aem  # Adjust the runner OS if needed
     steps:
-      - uses: actions/checkout@v3  # Checkout your repository code
+      #- uses: actions/checkout@v3  # Checkout your repository code
 
       - name: Download AEM package (optional)
         # Uncomment if your package isn't already in the repository:
         uses: actions/download-artifact@v3
         with:
-          name: ${{ secrets.AEM_PACKAGE_NAME }}
+          name: ${{ AEM_PACKAGE_NAME }}
           path: .
 
       - name: Upload AEM package
@@ -22,7 +22,7 @@ jobs:
           curl -u ${{ secrets.AEM_CREDENTIALS }} \
             -F cmd=upload \
             -F force=true \
-            -F package=@${{ secrets.AEM_PACKAGE_NAME }} \
+            -F package=@${{ AEM_PACKAGE_NAME }} \
             http://${{ secrets.AEM_HOST }}:4502/crx/packmgr/service/.json
         env:
           AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
