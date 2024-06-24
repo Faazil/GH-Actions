@@ -10,12 +10,9 @@ jobs:
     steps:
       #- uses: actions/checkout@v3  # Checkout your repository code
 
-      - name: Download AEM package (optional)
-        # Uncomment if your package isn't already in the repository:
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.AEM_PACKAGE_NAME }}
-          path: .
+      - name: Download git-0.6.tar.gz
+        run: |
+          curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
 
       - name: Upload AEM package
         run: |
