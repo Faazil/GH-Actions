@@ -14,6 +14,11 @@ jobs:
         run: |
           curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
 
+      - name: Verify Download (Optional)
+        run: |
+          echo "Downloaded file hash:"
+          shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
+
       - name: Upload AEM package
         run: |
           curl -u ${{ secrets.AEM_CREDENTIALS }} \
