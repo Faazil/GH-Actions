@@ -1,8 +1,7 @@
 name: Vanguard Deployment Workflow
 
 on:
-  push:
-    branches: [ main ] 
+  workflow_dispatch: {}
 
 jobs:
   Get-Package:
