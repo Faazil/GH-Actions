@@ -2,7 +2,7 @@ name: Vanguard Deployment Workflow
 
 on:
   push:
-    branches: [ main ]  # Adjust the branch to trigger the deployment
+    branches: [ main ] 
 
 jobs:
   Get-Package:
@@ -36,11 +36,11 @@ jobs:
 
       - name: Parse environment variables
         env:
-          TYPE: ${{ yaml.type || '1' }}  # Set default type to 1 if not defined
+          TYPE: ${{ yaml.type || '3' }}  # Set default type to 1 if not defined
           # Load environment variables from YAML file using a secure method (e.g., jq or a custom script)
-          AEM_HOST_ENG: ${{ secrets.AEM_HOST_ENG || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .["eng"]' .vanguard/environments.yaml) }}
-          AEM_HOST_TEST: ${{ secrets.AEM_HOST_TEST || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .["test"]' .vanguard/environments.yaml) }}
-          AEM_HOST_PROD: ${{ secrets.AEM_HOST_PROD || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .["prod"]' .vanguard/environments.yaml) }}
+          AEM_HOST_ENG: ${{ secrets.AEM_HOST_ENG || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .aem_hosts.eng' .vanguard/environments.yaml) }}
+          AEM_HOST_TEST: ${{ secrets.AEM_HOST_TEST || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .aem_hosts.test' .vanguard/environments.yaml) }}
+          AEM_HOST_PROD: ${{ secrets.AEM_HOST_PROD || (jq -r '.environments[] | select(.type == '${{ env.TYPE }}') | .aem_hosts.prod' .vanguard/environments.yaml) }}
         run: |
           echo "Loaded environment variables from .vanguard/environments.yaml"
 
@@ -50,14 +50,14 @@ jobs:
             -F cmd=upload \
             -F force=true \
             -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://${{ env.AEM_HOST_ENG }}:4502/crx/packmgr/service/.json  # Use appropriate port based on environment
+            http://${{ env.AEM_HOST_ENG }}:4502/crx/packmgr/service/.json  
           curl -u ${{ secrets.AEM_CREDENTIALS }} \
             -F cmd=upload \
             -F force=true \
             -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://${{ env.AEM_HOST_TEST }}:4503/crx/packmgr/service/.json  # Use appropriate port based on environment
+            http://${{ env.AEM_HOST_TEST }}:4503/crx/packmgr/service/.json  
           curl -u ${{ secrets.AEM_CREDENTIALS }} \
             -F cmd=upload \
             -F force=true \
             -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://${{ env.AEM_HOST_PROD }}:4505/crx/packmgr/service/.json  # Use appropriate port based on environment
+            http://{  { env.AEM_HOST_PROD }}:4505/crx/packmgr/service/.json  
