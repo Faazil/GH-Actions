@@ -53,7 +53,4 @@ jobs:
             -F force=true \
             -F package=@$AEM_PACKAGE_NAME \
             http://$AEM_HOST:4502/crx/packmgr/service/.json
-            -F cmd=upload \
-            -F force=true \
-            -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://$AEM_HOST:4502/crx/packmgr/service/.json
+            
