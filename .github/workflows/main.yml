@@ -2,7 +2,7 @@ name: AEM Deployment Workflow
 
 on:
   push:
-    branches: [ main ]  # Adjust the branch to trigger the deployment
+    branches: [ main ] 
 
 jobs:
   Get-Package:
