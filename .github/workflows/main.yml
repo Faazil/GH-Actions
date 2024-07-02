@@ -23,23 +23,31 @@ jobs:
       - name: Checkout code (if needed)
         uses: actions/checkout@v3
 
-      - name: Get server address
+      - name: Set server address
+        env:
+          AEM_DEV_HOST: ${{ secrets.AEM_DEV_HOST }}
+          AEM_STAGE_HOST: ${{ secrets.AEM_STAGE_HOST }}
         run: |
-          echo "Select server environment (dev, stage, or prod):"
-          read server_address
-
-          if [[ "$server_address" == "dev" ]]; then
-            aem_host=${{ env.AEM_DEV_HOST }}
-          elif [[ "$server_address" == "stage" ]]; then
-            aem_host=${{ env.AEM_STAGE_HOST }}
+          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+            echo "AEM_HOST=${{ secrets.AEM_DEV_HOST }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "stage" ]]; then
+            echo "AEM_HOST=${{ secrets.AEM_STAGE_HOST }}" >> $GITHUB_ENV
           else
             echo "Invalid server address!"
             exit 1
           fi
 
       - name: Upload AEM package (conditional)
+        env:
+          AEM_HOST: ${{ env.AEM_HOST }}
+          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+          AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
         run: |
-          curl -u ${{ secrets.AEM_CREDENTIALS }} \
+          curl -u $AEM_CREDENTIALS \
+            -F cmd=upload \
+            -F force=true \
+            -F package=@$AEM_PACKAGE_NAME \
+            http://$AEM_HOST:4502/crx/packmgr/service/.json
             -F cmd=upload \
             -F force=true \
             -F package=@${{ env.AEM_PACKAGE_NAME }} \
