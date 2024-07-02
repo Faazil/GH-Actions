@@ -56,4 +56,4 @@ jobs:
             -F cmd=upload \
             -F force=true \
             -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://$aem_host:4502/crx/packmgr/service/.json
+            http://$AEM_HOST:4502/crx/packmgr/service/.json
