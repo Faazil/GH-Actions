@@ -19,17 +19,31 @@ jobs:
           echo "Downloaded file hash:"
           shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
   Upload-Package:
-    runs-on: aem  # Adjust the runner OS if needed
-    steps:
-      - name: Upload AEM package
-        run: |
-          curl -u ${{ secrets.AEM_CREDENTIALS }} \
-            -F cmd=upload \
-            -F force=true \
-            -F package=@${{ env.AEM_PACKAGE_NAME }} \
-            http://${{ secrets.AEM_HOST }}:4502/crx/packmgr/service/.json
-        env:
-          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-          AEM_HOST: ${{ secrets.AEM_HOST }}
-          AEM_PACKAGE_NAME: "we.retail.community.apps-1.11.84.zip" 
+   runs-on: aem  # Adjust the runner OS if needed
+   steps:
+    - name: Checkout code (if needed)
+      uses: actions/checkout@v3
+
+    - name: Get server address
+      run: |
+        read -p "Enter AEM server address (dev, stage, or prod): " server_address
+
+    - name: Upload AEM package (conditional)
+      run: |
+        if [[ "$server_address" == "dev" ]]; then
+          aem_host=${{ env.AEM_DEV_HOST }}
+        elif [[ "$server_address" == "stage" ]]; then
+          aem_host=${{ env.AEM_STAGE_HOST }}
+        elif [[ "$server_address" == "prod" ]]; then
+          aem_host=${{ env.AEM_STAGE_HOST }}  # Change to prod host if needed
+        else
+          echo "Invalid server address!"
+          exit 1
+        fi
+
+        curl -u ${{ secrets.AEM_CREDENTIALS }} \
+          -F cmd=upload \
+          -F force=true \
+          -F package=@${{ env.AEM_PACKAGE_NAME }} \
+          http://$aem_host:4502/crx/packmgr/service/.json
 
