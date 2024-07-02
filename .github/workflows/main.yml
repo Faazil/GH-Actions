@@ -1,8 +1,13 @@
 name: AEM Deployment Workflow
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment (dev or stage)'
+        required: true
+        default: 'dev'
+
 
 jobs:
   Get-Package:
