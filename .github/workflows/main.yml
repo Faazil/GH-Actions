@@ -1,56 +1,82 @@
 name: AEM Deployment Workflow
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment (dev or stage)'
+      type:
+        description: 'Environment type (1, 2, or 3)'
         required: true
-        default: 'dev'
-
+        default: '1'
+        type: choice
+        options:
+          - 1
+          - 2
+          - 3
+      environment:
+        description: 'Environment (eng, test, prod)'
+        required: true
+        type: choice
+        options:
+          - eng
+          - test
+          - prod
+          - localhost
 
 jobs:
   Get-Package:
     runs-on: aem  # Adjust the runner OS if needed
     steps:
-       - name: Download git-0.6.tar.gz
-         run: |
+      - name: Download git-0.6.tar.gz
+        run: |
           curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
 
-       - name: Verify Download (Optional)
-         run: |
+      - name: Verify Download (Optional)
+        run: |
           echo "Downloaded file hash:"
           shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
+      - name: Checkout code
+        uses: actions/checkout@v3
 
   Upload-Package:
     runs-on: aem  # Adjust the runner OS if needed
     steps:
-      - name: Checkout code (if needed)
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set server address
-        env:
-          AEM_DEV_HOST: ${{ secrets.AEM_DEV_HOST }}
-          AEM_STAGE_HOST: ${{ secrets.AEM_STAGE_HOST }}
         run: |
-          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
-            echo "AEM_HOST=${{ secrets.AEM_DEV_HOST }}" >> $GITHUB_ENV
-          elif [[ "${{ github.event.inputs.environment }}" == "stage" ]]; then
-            echo "AEM_HOST=${{ secrets.AEM_STAGE_HOST }}" >> $GITHUB_ENV
-          else
-            echo "Invalid server address!"
-            exit 1
-          fi
+          pip install pyyaml
+          python -c "
+          import yaml
+          import os
+
+          with open('environments.yaml', 'r') as file:
+          environments = yaml.safe_load(file)
+
+          env_type = int(os.getenv('INPUT_TYPE'))
+          env_name = os.getenv('INPUT_ENVIRONMENT')
+
+for env in environments['environments']:
+    if env['type'] == env_type:
+        aem_host = env['aem_hosts'].get(env_name, None)
+        if aem_host:
+            print(f'AEM_HOST={aem_host}')
+            with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                env_file.write(f'AEM_HOST={aem_host}\n')
+        else:
+            raise ValueError(f'Invalid environment name: {env_name}')
+          "
 
       - name: Upload AEM package (conditional)
         env:
           AEM_HOST: ${{ env.AEM_HOST }}
           AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-          AEM_PACKAGE_NAME: "we.retail.community.apps-1.11.84.zip"
+          AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
         run: |
           curl -u $AEM_CREDENTIALS \
             -F cmd=upload \
             -F force=true \
             -F package=@$AEM_PACKAGE_NAME \
-            http://$AEM_HOST:4502/crx/packmgr/service/.json
-            
+            http://$AEM_HOST/crx/packmgr/service/.json
