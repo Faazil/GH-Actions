@@ -1,4 +1,4 @@
-name: AEM Deployment Workflows
+name: AEM Deployment Workflow
 
 on:
   push:
