@@ -46,7 +46,7 @@ jobs:
         env:
           AEM_HOST: ${{ env.AEM_HOST }}
           AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-          AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
+          AEM_PACKAGE_NAME: "we.retail.community.apps-1.11.84.zip"
         run: |
           curl -u $AEM_CREDENTIALS \
             -F cmd=upload \
