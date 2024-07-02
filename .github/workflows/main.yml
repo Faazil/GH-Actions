@@ -1,4 +1,4 @@
-name: AEM Deployment Workflow
+name: Main Workflow
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
           - 2
           - 3
       environment:
-        description: 'Environment (eng, test, prod)'
+        description: 'Environment (eng, test, prod, localhost)'
         required: true
         type: choice
         options:
@@ -24,21 +24,13 @@ on:
 
 jobs:
   Get-Package:
-    runs-on: aem  # Adjust the runner OS if needed
+    runs-on: ubuntu-latest  # Adjust the runner OS if needed
     steps:
-      - name: Download git-0.6.tar.gz
-        run: |
-          curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
-
-      - name: Verify Download (Optional)
-        run: |
-          echo "Downloaded file hash:"
-          shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
       - name: Checkout code
         uses: actions/checkout@v3
 
   Upload-Package:
-    runs-on: aem  # Adjust the runner OS if needed
+    runs-on: ubuntu-latest  # Adjust the runner OS if needed
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,7 +42,7 @@ jobs:
           import yaml
           import os
 
-          with open('environments.yaml', 'r') as file:
+          with open('.github/environments.yaml', 'r') as file:
           environments = yaml.safe_load(file)
 
           env_type = int(os.getenv('INPUT_TYPE'))
