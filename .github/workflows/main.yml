@@ -48,11 +48,11 @@ jobs:
           env_type = int(os.getenv('INPUT_TYPE'))
           env_name = os.getenv('INPUT_ENVIRONMENT')
 
-for env in environments['environments']:
-    if env['type'] == env_type:
-        aem_host = env['aem_hosts'].get(env_name, None)
-        if aem_host:
-            print(f'AEM_HOST={aem_host}')
+        for env in environments['environments']:
+           if env['type'] == env_type:
+              aem_host = env['aem_hosts'].get(env_name, None)
+           if aem_host:
+               print(f'AEM_HOST={aem_host}')
             with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
                 env_file.write(f'AEM_HOST={aem_host}\n')
         else:
