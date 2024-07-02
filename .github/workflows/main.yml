@@ -8,7 +8,9 @@ on:
         required: true
         default: 'dev'
 
+-- Get the type from env file ----
 
+-- call deploy action and pass type and env -------
 jobs:
   Get-Package:
     runs-on: aem  # Adjust the runner OS if needed
