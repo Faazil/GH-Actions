@@ -34,7 +34,7 @@ jobs:
       - name: Checkout environments.yaml from GH-Actions-02
         uses: actions/checkout@v3
         with:
-          repository: GH-Actions-02
+          repository: Faazil/GH-Actions-02
           path: GH-Actions-02
 
       - name: Set environment variables
