@@ -7,28 +7,53 @@ on:
         description: 'Environment (dev or stage)'
         required: true
         default: 'dev'
+      awsAccount:
+        description: 'AWS Account (e.g., 1eng, 1twst, 1prod, localhost)'
+        required: true
+        default: 'localhost'
 
--- Get the type from env file ----
-
--- call deploy action and pass type and env -------
 jobs:
   Get-Package:
-    runs-on: aem  # Adjust the runner OS if needed
+    runs-on: aem
     steps:
-       - name: Download git-0.6.tar.gz
-         run: |
+      - name: Download git-0.6.tar.gz
+        run: |
           curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
 
-       - name: Verify Download (Optional)
-         run: |
+      - name: Verify Download (Optional)
+        run: |
           echo "Downloaded file hash:"
           shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
 
   Upload-Package:
-    runs-on: aem  # Adjust the runner OS if needed
+    runs-on: aem
     steps:
       - name: Checkout code (if needed)
         uses: actions/checkout@v3
+
+      - name: Checkout environments.yaml from GH-Actions-02
+        uses: actions/checkout@v3
+        with:
+          repository: GH-Actions-02
+          path: GH-Actions-02
+
+      - name: Set environment variables
+        run: |
+          echo "Reading environments.yaml"
+          ENVIRONMENT_FILE="GH-Actions-02/environments.yaml"
+          AWS_ACCOUNTS=$(yq e '.environments[0].awsAccounts[]' $ENVIRONMENT_FILE)
+          echo "AWS_ACCOUNTS=$AWS_ACCOUNTS" >> $GITHUB_ENV
+          echo "Available AWS Accounts: $AWS_ACCOUNTS"
+
+      - name: Validate AWS Account
+        run: |
+          if [[ ! " ${AWS_ACCOUNTS[@]} " =~ " ${GITHUB_EVENT_INPUTS_AWSACCOUNT} " ]]; then
+            echo "Invalid AWS Account! Must be one of: $AWS_ACCOUNTS"
+            exit 1
+          fi
+        env:
+          AWS_ACCOUNTS: ${{ env.AWS_ACCOUNTS }}
+          GITHUB_EVENT_INPUTS_AWSACCOUNT: ${{ github.event.inputs.awsAccount }}
 
       - name: Set server address
         env:
@@ -55,4 +80,3 @@ jobs:
             -F force=true \
             -F package=@$AEM_PACKAGE_NAME \
             http://$AEM_HOST:4502/crx/packmgr/service/.json
-            
