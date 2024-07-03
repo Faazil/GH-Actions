@@ -37,18 +37,24 @@ jobs:
           repository: Faazil/GH-Actions-02
           path: GH-Actions-02
 
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
+          chmod +x /usr/bin/yq
+
       - name: Set environment variables
         run: |
           echo "Reading environments.yaml"
           ENVIRONMENT_FILE="GH-Actions-02/environments.yaml"
-          AWS_ACCOUNTS=$(yq e '.environments[0].awsAccounts[]' $ENVIRONMENT_FILE)
+          AWS_ACCOUNTS=$(yq e '.environments[0].awsAccounts[]' $ENVIRONMENT_FILE | paste -sd "," -)
           echo "AWS_ACCOUNTS=$AWS_ACCOUNTS" >> $GITHUB_ENV
           echo "Available AWS Accounts: $AWS_ACCOUNTS"
 
       - name: Validate AWS Account
         run: |
-          if [[ ! " ${AWS_ACCOUNTS[@]} " =~ " ${GITHUB_EVENT_INPUTS_AWSACCOUNT} " ]]; then
-            echo "Invalid AWS Account! Must be one of: $AWS_ACCOUNTS"
+          IFS=',' read -r -a array <<< "$AWS_ACCOUNTS"
+          if [[ ! " ${array[@]} " =~ " ${GITHUB_EVENT_INPUTS_AWSACCOUNT} " ]]; then
+            echo "Invalid AWS Account! Must be one of: ${array[@]}"
             exit 1
           fi
         env:
