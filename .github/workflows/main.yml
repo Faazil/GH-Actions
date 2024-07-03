@@ -42,7 +42,7 @@ jobs:
           mkdir -p ~/.local/bin
           wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O ~/.local/bin/yq
           chmod +x ~/.local/bin/yq
-          echo "::add-path::${HOME}/.local/bin"
+          echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
       - name: Set environment variables
         run: |
@@ -72,3 +72,19 @@ jobs:
             echo "AEM_HOST=${{ secrets.AEM_DEV_HOST }}" >> $GITHUB_ENV
           elif [[ "${{ github.event.inputs.environment }}" == "stage" ]]; then
             echo "AEM_HOST=${{ secrets.AEM_STAGE_HOST }}" >> $GITHUB_ENV
+          else
+            echo "Invalid server address!"
+            exit 1
+          fi
+
+      - name: Upload AEM package (conditional)
+        env:
+          AEM_HOST: ${{ env.AEM_HOST }}
+          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+          AEM_PACKAGE_NAME: "we.retail.community.apps-1.11.84.zip"
+        run: |
+          curl -u $AEM_CREDENTIALS \
+            -F cmd=upload \
+            -F force=true \
+            -F package=@$AEM_PACKAGE_NAME \
+            http://$AEM_HOST:4502/crx/packmgr/service/.json
