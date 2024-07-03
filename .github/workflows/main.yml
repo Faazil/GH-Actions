@@ -3,10 +3,6 @@ name: AEM Deployment Workflow
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment (dev or stage)'
-        required: true
-        default: 'dev'
       awsAccount:
         description: 'AWS Account (e.g., 1eng, 1twst, 1prod, localhost)'
         required: true
@@ -58,24 +54,12 @@ jobs:
           if [[ ! " ${array[@]} " =~ " ${GITHUB_EVENT_INPUTS_AWSACCOUNT} " ]]; then
             echo "Invalid AWS Account! Must be one of: ${array[@]}"
             exit 1
+          else
+            echo "AEM_HOST=${GITHUB_EVENT_INPUTS_AWSACCOUNT}" >> $GITHUB_ENV
           fi
         env:
           AWS_ACCOUNTS: ${{ env.AWS_ACCOUNTS }}
           GITHUB_EVENT_INPUTS_AWSACCOUNT: ${{ github.event.inputs.awsAccount }}
-
-      - name: Set server address
-        env:
-          AEM_DEV_HOST: ${{ secrets.AEM_DEV_HOST }}
-          AEM_STAGE_HOST: ${{ secrets.AEM_STAGE_HOST }}
-        run: |
-          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
-            echo "AEM_HOST=${{ secrets.AEM_DEV_HOST }}" >> $GITHUB_ENV
-          elif [[ "${{ github.event.inputs.environment }}" == "stage" ]]; then
-            echo "AEM_HOST=${{ secrets.AEM_STAGE_HOST }}" >> $GITHUB_ENV
-          else
-            echo "Invalid server address!"
-            exit 1
-          fi
 
       - name: Upload AEM package (conditional)
         env:
