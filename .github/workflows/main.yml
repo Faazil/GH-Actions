@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       awsAccount:
-        description: 'AWS Account (e.g., 1eng, 1twst, 1prod, localhost)'
+        description: 'AWS Account (e.g., eng, test, prod, localhost)'
         required: true
         default: 'localhost'
 
