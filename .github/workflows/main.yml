@@ -32,7 +32,7 @@ jobs:
         if: steps.validate.outputs.environment
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: Faazil/common
           event-type: deploy-environment
           client-payload: '{"environment": "${{ steps.validate.outputs.environment }}"}'
