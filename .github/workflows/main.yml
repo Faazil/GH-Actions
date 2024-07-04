@@ -30,9 +30,9 @@ jobs:
 
       - name: Trigger Common Repository Workflow
         if: steps.validate.outputs.environment
-        uses: peter-evans/repository-dispatch@v2
+        uses: Faazil/Common@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: your-username/Common
+          #token: ${{ secrets.GITHUB_TOKEN }}
+          repository: Faazil/Common
           event-type: deploy-environment
           client-payload: '{"environment": "${{ steps.validate.outputs.environment }}"}'
