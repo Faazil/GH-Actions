@@ -1,74 +1,29 @@
-name: AEM Deployment Workflow
+name: Deploy Workflow
 
 on:
   workflow_dispatch:
     inputs:
-      awsAccount:
-        description: 'AWS Account (e.g., eng, test, prod, localhost)'
+      environment:
+        description: 'Select environment'
         required: true
-        default: 'localhost'
+        default: '1loc'
+        options:
+          - 1eng
+          - 1test
+          - 1prod
+          - 1loc
 
 jobs:
-  Get-Package:
-    runs-on: aem
+  trigger-deployment:
+    runs-on: ubuntu-latest
     steps:
-      - name: Download git-0.6.tar.gz
-        run: |
-          curl -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-0.6.tar.gz -o git-0.6.tar.gz
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Verify Download (Optional)
-        run: |
-          echo "Downloaded file hash:"
-          shasum -a 256 ${GITHUB_WORKSPACE}/git-0.6.tar.gz
-
-  Upload-Package:
-    runs-on: aem
-    steps:
-      - name: Checkout code (if needed)
-        uses: actions/checkout@v3
-
-      - name: Checkout environments.yaml from GH-Actions-02
-        uses: actions/checkout@v3
+      - name: Trigger Common Repository Workflow
+        uses: peter-evans/repository-dispatch@v2
         with:
-          repository: Faazil/GH-Actions-02
-          path: GH-Actions-02
-
-      - name: Install yq
-        run: |
-          mkdir -p ~/.local/bin
-          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O ~/.local/bin/yq
-          chmod +x ~/.local/bin/yq
-          echo "${HOME}/.local/bin" >> $GITHUB_PATH
-
-      - name: Set environment variables
-        run: |
-          echo "Reading environments.yaml"
-          ENVIRONMENT_FILE="GH-Actions-02/environments.yaml"
-          AWS_ACCOUNTS=$(yq e '.environments[0].awsAccounts[]' $ENVIRONMENT_FILE | paste -sd "," -)
-          echo "AWS_ACCOUNTS=$AWS_ACCOUNTS" >> $GITHUB_ENV
-          echo "Available AWS Accounts: $AWS_ACCOUNTS"
-
-      - name: Validate AWS Account
-        run: |
-          IFS=',' read -r -a array <<< "$AWS_ACCOUNTS"
-          if [[ ! " ${array[@]} " =~ " ${GITHUB_EVENT_INPUTS_AWSACCOUNT} " ]]; then
-            echo "Invalid AWS Account! Must be one of: ${array[@]}"
-            exit 1
-          else
-            echo "AEM_HOST=${GITHUB_EVENT_INPUTS_AWSACCOUNT}" >> $GITHUB_ENV
-          fi
-        env:
-          AWS_ACCOUNTS: ${{ env.AWS_ACCOUNTS }}
-          GITHUB_EVENT_INPUTS_AWSACCOUNT: ${{ github.event.inputs.awsAccount }}
-
-      - name: Upload AEM package (conditional)
-        env:
-          AEM_HOST: ${{ env.AEM_HOST }}
-          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-          AEM_PACKAGE_NAME: "we.retail.community.apps-1.11.84.zip"
-        run: |
-          curl -u $AEM_CREDENTIALS \
-            -F cmd=upload \
-            -F force=true \
-            -F package=@$AEM_PACKAGE_NAME \
-            http://$AEM_HOST:4502/crx/packmgr/service/.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: your-username/Common
+          event-type: deploy-environment
+          client-payload: '{"environment": "${{ github.event.inputs.environment }}"}'
