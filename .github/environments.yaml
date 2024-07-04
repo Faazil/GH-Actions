@@ -1,7 +1,7 @@
 environments:
   - type: 1
-    aem_hosts:
-      eng: 4502
-      test: 4503
-      prod: 4505
+    awsAccounts:
+     - 1eng
+     - 1test
+     - 1prod
   
