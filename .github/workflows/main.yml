@@ -30,9 +30,9 @@ jobs:
 
       - name: Trigger Common Repository Workflow
         if: steps.validate.outputs.environment
-        uses: Faazil/Common@v2
-        with:
-          #token: ${{ secrets.GITHUB_TOKEN }}
-          repository: Faazil/Common
-          event-type: deploy-environment
-          client-payload: '{"environment": "${{ steps.validate.outputs.environment }}"}'
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Content-Type: application/json" \
+            -d '{"event_type": "deploy-environment", "client_payload": {"environment": "${{ steps.validate.outputs.environment }}"}}' \
+            https://api.github.com/repos/Faazil/common/dispatches
