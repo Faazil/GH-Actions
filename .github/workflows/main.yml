@@ -6,24 +6,33 @@ on:
       environment:
         description: 'Select environment'
         required: true
-        default: '1loc'
-        options:
-          - 1eng
-          - 1test
-          - 1prod
-          - 1loc
+        default: '1test'
 
 jobs:
-  trigger-deployment:
+  validate-and-trigger:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Validate Environment Input
+        id: validate
+        run: |
+          VALID_ENVIRONMENTS=("1eng" "1test" "1prod" "1loc")
+          INPUT_ENVIRONMENT="${{ github.event.inputs.environment }}"
+          if [[ " ${VALID_ENVIRONMENTS[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
+            echo "Environment input is valid: ${INPUT_ENVIRONMENT}"
+            echo "::set-output name=environment::${INPUT_ENVIRONMENT}"
+          else
+            echo "Invalid environment input: ${INPUT_ENVIRONMENT}"
+            exit 1
+          fi
+
       - name: Trigger Common Repository Workflow
+        if: steps.validate.outputs.environment
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: your-username/Common
           event-type: deploy-environment
-          client-payload: '{"environment": "${{ github.event.inputs.environment }}"}'
+          client-payload: '{"environment": "${{ steps.validate.outputs.environment }}"}'
