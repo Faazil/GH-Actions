@@ -1,4 +1,4 @@
-name: Extract Values and Use Variables
+name: Extract Values and Use Variables 
 
 on:
   push:
