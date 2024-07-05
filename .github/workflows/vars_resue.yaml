@@ -7,7 +7,7 @@ on:
 
 jobs:
   extract-values:
-    runs-on: aem
+    runs-on: aem001
 
     steps:
     - name: Checkout code
