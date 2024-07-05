@@ -7,7 +7,7 @@ on:
 
 jobs:
   extract-values:
-    runs-on: ubuntu-latest
+    runs-on: aem
 
     steps:
     - name: Checkout code
