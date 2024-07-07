@@ -6,11 +6,23 @@ on:
       - main
 
 jobs:
-  extract-values:
-    runs-on: sun
+  checkout:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Save the repository path
+      run: echo "REPO_PATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
+  extract-values:
+    
+    runs-on: redhat01
+    needs: checkout
+
+    steps:
+    - name: Checkout code (again)
       uses: actions/checkout@v2
 
     - name: Upload AEM package (conditional)
@@ -39,9 +51,7 @@ jobs:
         echo "Group: ${{ env.group }}"
         echo "Download Name: ${{ env.downloadName }}"
 
-    # Add subsequent steps here that use the extracted values
     - name: Use extracted values
       run: |
-        # Example of using the extracted values
         echo "Using group: ${{ env.group }}"
         echo "Using downloadName: ${{ env.downloadName }}"
