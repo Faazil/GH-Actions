@@ -60,6 +60,7 @@ jobs:
     needs: validate-and-deploy
     uses: Faazil/common/.github/workflows/deployment.yaml@main
     with:
+      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: we.retail.community.apps-1.11.84.zip
       AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
     secrets:
