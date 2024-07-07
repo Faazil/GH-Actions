@@ -1,0 +1,67 @@
+name: CICD Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select environment'
+        required: true
+        default: '1loc'
+
+jobs:
+  validate-and-deploy:
+    runs-on: rhel88
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate Environment Input
+        id: validate
+        run: |
+          VALID_ENVIRONMENTS=("1eng" "1test" "1prod" "1loc")
+          INPUT_ENVIRONMENT="${{ github.event.inputs.environment }}"
+          if [[ " ${VALID_ENVIRONMENTS[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
+            echo "Environment input is valid: ${INPUT_ENVIRONMENT}"
+            echo "environment=${INPUT_ENVIRONMENT}" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid environment input: ${INPUT_ENVIRONMENT}"
+            exit 1
+          fi
+
+      - name: Ensure env_urls.yaml is available
+        run: |
+          if [ ! -f env_urls.yaml ]; then
+            echo "env_urls.yaml not found in the repository."
+            exit 1
+          fi
+
+      - name: Extract Environment URL
+        id: extract_url
+        run: |
+          environment=${{ steps.validate.outputs.environment }}
+          url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} $1 ~ "^ *"env"$" {gsub(/^ *| *$/, "", $2); print $2}' env_urls.yaml)
+          if [ -z "$url" ]; then
+            echo "Invalid environment: $environment"
+            exit 1
+          fi
+          echo "AEM_HOST=$url" >> $GITHUB_ENV
+
+      - name: Check variable
+        run: echo $AEM_HOST
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: we.retail.community.apps-1.11.84.zip
+
+      - name: Set AEM_PACKAGE_NAME environment variable
+        run: echo "AEM_PACKAGE_NAME=we.retail.community.apps-1.11.84.zip" >> $GITHUB_ENV
+
+      - name: Upload AEM Package 
+        uses: Faazil/common/.github/workflows/deployment.yaml@main
+        with:
+          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+        env:
+          AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
+          AEM_HOST: ${{ env.AEM_HOST }}
