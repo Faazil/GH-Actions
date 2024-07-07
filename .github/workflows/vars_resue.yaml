@@ -6,28 +6,12 @@ on:
       - main
 
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
+  extract-values:
+    runs-on: rhel88
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-
-  extract-values:
-    runs-on: self-hosted
-    runs-on: redhat01
-    needs: checkout
-
-    steps:
-    - name: Checkout code (again)
-      uses: actions/checkout@v2
-
-    - name: Verify AEM package exists
-      run: |
-        if [ ! -f we.retail.community.apps-1.11.84.zip ]; then
-          echo "AEM package not found!"
-          exit 1
-        fi
+      uses: actions/checkout@v3
 
     - name: Upload AEM package (conditional)
       env:
@@ -38,10 +22,9 @@ jobs:
         response=$(curl -u $AEM_CREDENTIALS \
           -F cmd=upload \
           -F force=true \
-          -F package=@${{ env.AEM_PACKAGE_NAME }} \
-          http://$AEM_HOST:4502/crx/packmgr/service/.json)
+          -F package=@$AEM_PACKAGE_NAME \
+          http://$AEM_HOST/crx/packmgr/service/.json)
         echo "$response" > response.json
-
     - name: Extract values from response
       id: extract
       run: |
@@ -49,13 +32,13 @@ jobs:
         downloadName=$(jq -r '.data.package.downloadName' response.json)
         echo "group=$group" >> $GITHUB_ENV
         echo "downloadName=$downloadName" >> $GITHUB_ENV
-
     - name: Print extracted values
       run: |
         echo "Group: ${{ env.group }}"
         echo "Download Name: ${{ env.downloadName }}"
-
+    # Add subsequent steps here that use the extracted values
     - name: Use extracted values
       run: |
+        # Example of using the extracted values
         echo "Using group: ${{ env.group }}"
         echo "Using downloadName: ${{ env.downloadName }}"
