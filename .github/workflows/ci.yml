@@ -1,0 +1,14 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  print-hostname:
+    runs-on: rhel88
+   
+    steps:
+      - name: Print Hostname
+        run: hostname
