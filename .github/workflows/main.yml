@@ -1,4 +1,4 @@
-name: Deploy Workflow   
+name: Deploy Workflow
 
 on:
   workflow_dispatch:
@@ -22,14 +22,14 @@ jobs:
           INPUT_ENVIRONMENT="${{ github.event.inputs.environment }}"
           if [[ " ${VALID_ENVIRONMENTS[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
             echo "Environment input is valid: ${INPUT_ENVIRONMENT}"
-            echo "::set-output name=environment::${INPUT_ENVIRONMENT}"
+            echo "environment=${INPUT_ENVIRONMENT}" >> $GITHUB_OUTPUT
           else
             echo "Invalid environment input: ${INPUT_ENVIRONMENT}"
             exit 1
           fi
 
       - name: Trigger Common Repository Workflow
-        if: steps.validate.outputs.environment
+        if: always()
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.PAT }}
