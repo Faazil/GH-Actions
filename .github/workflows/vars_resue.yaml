@@ -13,17 +13,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Save the repository path
-      run: echo "REPO_PATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-
   extract-values:
-    
+    runs-on: self-hosted
     runs-on: redhat01
     needs: checkout
 
     steps:
-    #- name: Checkout code (again)
-     # uses: actions/checkout@v2
+    - name: Checkout code (again)
+      uses: actions/checkout@v2
+
+    - name: Verify AEM package exists
+      run: |
+        if [ ! -f we.retail.community.apps-1.11.84.zip ]; then
+          echo "AEM package not found!"
+          exit 1
+        fi
 
     - name: Upload AEM package (conditional)
       env:
