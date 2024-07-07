@@ -1,4 +1,4 @@
-name: CICD Workflow 
+name: CICD Workflow
 
 on:
   workflow_dispatch:
@@ -26,14 +26,12 @@ jobs:
           else
             echo "Invalid environment input: ${INPUT_ENVIRONMENT}"
             exit 1
-          fi
 
       - name: Ensure env_urls.yaml is available
         run: |
           if [ ! -f env_urls.yaml ]; then
             echo "env_urls.yaml not found in the repository."
             exit 1
-          fi
 
       - name: Extract Environment URL
         id: extract_url
@@ -58,10 +56,13 @@ jobs:
       - name: Set AEM_PACKAGE_NAME environment variable
         run: echo "AEM_PACKAGE_NAME=we.retail.community.apps-1.11.84.zip" >> $GITHUB_ENV
 
-      - name: Upload AEM Package 
-        uses: Faazil/common/.github/workflows/deployment.yaml@main
-        with:
-          AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-        env:
-          AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
-          AEM_HOST: ${{ env.AEM_HOST }}
+  upload-aem-package:
+    uses: Faazil/common/.github/workflows/deployment.yaml@main
+    needs: validate-and-deploy
+    with:
+      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+    secrets:
+      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+    env:
+      AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
+      AEM_HOST: ${{ env.AEM_HOST }}
