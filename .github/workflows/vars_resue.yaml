@@ -35,7 +35,7 @@ jobs:
           -F cmd=upload \
           -F force=true \
           -F package=@$AEM_PACKAGE_NAME \
-          http://$AEM_HOST/crx/packmgr/service/.json)
+          http://$AEM_HOST:4502/crx/packmgr/service/.json)
         echo "$response" > response.json
 
     - name: Extract values from response
