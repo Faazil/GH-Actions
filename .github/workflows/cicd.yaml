@@ -57,8 +57,8 @@ jobs:
         run: echo "AEM_PACKAGE_NAME=we.retail.community.apps-1.11.84.zip" >> $GITHUB_ENV
 
   upload-aem-package:
-    uses: Faazil/common/.github/workflows/deployment.yaml@main
     needs: validate-and-deploy
+    uses: Faazil/common/.github/workflows/deployment.yaml@main
     with:
       AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
       AEM_HOST: ${{ env.AEM_HOST }}
