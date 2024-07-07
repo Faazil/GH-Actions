@@ -22,8 +22,8 @@ jobs:
     needs: checkout
 
     steps:
-    - name: Checkout code (again)
-      uses: actions/checkout@v2
+    #- name: Checkout code (again)
+     # uses: actions/checkout@v2
 
     - name: Upload AEM package (conditional)
       env:
