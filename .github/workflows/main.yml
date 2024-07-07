@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-trigger:
-    runs-on: ubuntu-latest
+    runs-on: rhel88
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
