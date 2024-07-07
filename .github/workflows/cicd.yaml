@@ -12,8 +12,7 @@ jobs:
   validate-and-deploy:
     runs-on: rhel88
     outputs:
-      aem_host: ${{ steps.extract_url.outputs.AEM_HOST }}
-      aem_package_name: ${{ steps.set_package_name.outputs.AEM_PACKAGE_NAME }}
+      AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -58,14 +57,17 @@ jobs:
           path: we.retail.community.apps-1.11.84.zip
 
       - name: Set AEM_PACKAGE_NAME environment variable
+        run: echo "AEM_PACKAGE_NAME=we.retail.community.apps-1.11.84.zip" >> $GITHUB_ENV
         id: set_package_name
-        run: echo "::set-output name=AEM_PACKAGE_NAME::we.retail.community.apps-1.11.84.zip"
 
   upload-aem-package:
     needs: validate-and-deploy
     uses: Faazil/common/.github/workflows/deployment.yaml@main
     with:
-      AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.aem_package_name }}
-      AEM_HOST: ${{ needs.validate-and-deploy.outputs.aem_host }}
+      AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
+      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
     secrets:
       AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+    env:
+      AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
+      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
