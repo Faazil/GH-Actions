@@ -56,18 +56,12 @@ jobs:
           name: package
           path: we.retail.community.apps-1.11.84.zip
 
-      - name: Set AEM_PACKAGE_NAME environment variable
-        run: echo "AEM_PACKAGE_NAME=we.retail.community.apps-1.11.84.zip" >> $GITHUB_ENV
-        id: set_package_name
-
   upload-aem-package:
     needs: validate-and-deploy
     uses: Faazil/common/.github/workflows/deployment.yaml@main
     with:
-      AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
+      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+      AEM_PACKAGE_NAME: we.retail.community.apps-1.11.84.zip
       AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
     secrets:
       AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-    env:
-      AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
-      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
