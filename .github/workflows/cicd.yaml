@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-deploy:
-    runs-on: rhel88
+    runs-on: rhel888
     outputs:
       AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
     steps:
@@ -28,12 +28,14 @@ jobs:
           else
             echo "Invalid environment input: ${INPUT_ENVIRONMENT}"
             exit 1
+          fi
 
       - name: Ensure env_urls.yaml is available
         run: |
           if [ ! -f env_urls.yaml ]; then
             echo "env_urls.yaml not found in the repository."
             exit 1
+          fi
 
       - name: Extract Environment URL
         id: extract_url
@@ -58,10 +60,8 @@ jobs:
 
   upload-aem-package:
     needs: validate-and-deploy
-    uses: Faazil/common/.github/workflows/deployment.yaml@main
+    uses: Faazil/common/.github/workflows/deployment.yaml@main  # Assuming this points to your reusable workflow location
     with:
       AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: we.retail.community.apps-1.11.84.zip
       AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
-    secrets:
-      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
