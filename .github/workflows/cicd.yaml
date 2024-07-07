@@ -53,14 +53,11 @@ jobs:
 
       - name: Set AEM Credentials
         id: set-credentials
-        run: |
-          echo "::set-output name=AEM_CREDENTIALS::${{ secrets.AEM_CREDENTIALS }}"
+        run: echo "::set-output name=AEM_CREDENTIALS::${{ secrets.AEM_CREDENTIALS }}"
 
       - name: Set AEM Package Name
         id: set-package-name
-        run: |
-          PACKAGE_NAME='we.retail.community.apps-1.11.84.zip'
-          echo "::set-output name=AEM_PACKAGE_NAME::$PACKAGE_NAME"
+        run: echo "::set-output name=AEM_PACKAGE_NAME::we.retail.community.apps-1.11.84.zip"
 
       - name: Check variable
         run: echo $AEM_HOST
@@ -77,5 +74,4 @@ jobs:
     with:
       AEM_CREDENTIALS: ${{ needs.validate-and-deploy.outputs.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
-    secrets:
-      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
+      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
