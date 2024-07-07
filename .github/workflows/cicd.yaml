@@ -60,9 +60,7 @@ jobs:
     uses: Faazil/common/.github/workflows/deployment.yaml@main
     needs: validate-and-deploy
     with:
-      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-    secrets:
-      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
-    env:
       AEM_PACKAGE_NAME: ${{ env.AEM_PACKAGE_NAME }}
       AEM_HOST: ${{ env.AEM_HOST }}
+    secrets:
+      AEM_CREDENTIALS: ${{ secrets.AEM_CREDENTIALS }}
