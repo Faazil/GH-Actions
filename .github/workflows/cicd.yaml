@@ -68,6 +68,9 @@ jobs:
           name: package
           path: we.retail.community.apps-1.11.84.zip
 
+      - name: Enable Debug Logging
+        run: echo "::set-env name=ACTIONS_STEP_DEBUG::true"
+
   upload-aem-package:
     needs: validate-and-deploy
     uses: Faazil/Common/.github/workflows/deployment.yaml@main  # Assuming this points to your reusable workflow location
