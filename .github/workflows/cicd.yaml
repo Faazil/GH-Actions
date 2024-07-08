@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-deploy:
-    runs-on: rhel888
+    runs-on: rhel999
     outputs:
       AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
       AEM_CREDENTIALS: ${{ steps.set-credentials.outputs.AEM_CREDENTIALS }}
