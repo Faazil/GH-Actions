@@ -34,7 +34,7 @@ jobs:
 
       - name: Ensure env_urls.yaml is available
         run: |
-          if [ ! -f env_urls.yaml ]; then
+          if [ ! -f .github/env_urls.yaml ]; then
             echo "env_urls.yaml not found in the repository."
             exit 1
           fi
