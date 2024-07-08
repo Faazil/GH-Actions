@@ -43,7 +43,7 @@ jobs:
         id: extract_url
         run: |
           environment=${{ steps.validate.outputs.environment }}
-          url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} $1 ~ "^ *"env"$" {gsub(/^ *| *$/, "", $2); print $2}' env_urls.yaml)
+          url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} $1 ~ "^ *"env"$" {gsub(/^ *| *$/, "", $2); print $2}' .github/env_urls.yaml)
           if [ -z "$url" ]; then
             echo "Invalid environment: $environment"
             exit 1
