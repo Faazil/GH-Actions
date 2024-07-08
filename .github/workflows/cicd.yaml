@@ -22,9 +22,13 @@ jobs:
       - name: Validate Environment Input
         id: validate
         run: |
-          VALID_ENVIRONMENTS=("1eng" "1test" "1prod" "1loc")
+          VALID_ENVIRONMENTS=$(awk '/awsAccounts:/{flag=1;next}/type/{flag=0}flag' .github/environments.yaml | sed 's/- //g' | tr '\n' ' ')
+          
           INPUT_ENVIRONMENT="${{ github.event.inputs.environment }}"
-          if [[ " ${VALID_ENVIRONMENTS[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
+       
+          VALID_ENVIRONMENTS_ARRAY=($VALID_ENVIRONMENTS)
+          
+          if [[ " ${VALID_ENVIRONMENTS_ARRAY[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
             echo "Environment input is valid: ${INPUT_ENVIRONMENT}"
             echo "environment=${INPUT_ENVIRONMENT}" >> $GITHUB_OUTPUT
           else
