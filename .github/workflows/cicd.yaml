@@ -12,7 +12,7 @@ jobs:
   validate-and-deploy:
     runs-on: rhel999
     outputs:
-      AEM_AUTHOR_URL: ${{ steps.extract_url.outputs.AEM_AUTHOR_URL }}
+      AEM_HOST: ${{ steps.extract_url.outputs.AEM_AUTHOR_URL }}
       AEM_PREVIEW_URL: ${{ steps.extract_url.outputs.AEM_PREVIEW_URL }}
       AEM_CREDENTIALS: ${{ steps.set-credentials.outputs.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: ${{ steps.set-package-name.outputs.AEM_PACKAGE_NAME }}
@@ -106,5 +106,5 @@ jobs:
     with:
       AEM_CREDENTIALS: ${{ needs.validate-and-deploy.outputs.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
-      AEM_AUTHOR_URL: ${{ needs.validate-and-deploy.outputs.AEM_AUTHOR_URL }}
+      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_AUTHOR_URL }}
       AEM_PREVIEW_URL: ${{ needs.validate-and-deploy.outputs.AEM_PREVIEW_URL }}
