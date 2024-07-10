@@ -13,3 +13,7 @@ dns_file:
   3loc: http://localhost:4502
   Lob-Prod : http://localhost:6666
   Lob-Prod-preview: http://localhost:7777
+  ess-prod:
+  fis-prod:
+  ess-prod-preview:
+  fis-prod-preview:
