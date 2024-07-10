@@ -47,13 +47,25 @@ jobs:
         id: extract_url
         run: |
           environment=${{ steps.validate.outputs.environment }}
-          url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} $1 ~ "^ *"env"$" {gsub(/^ *| *$/, "", $2); print $2}' .github/env_urls.yaml)
-          if [ -z "$url" ]; then
-            echo "Invalid environment: $environment"
-            exit 1
+          
+          if [[ "$environment" == *"prod-live"* ]]; then
+            url=$(awk -F": " '/Lob-Prod:/{print $2}' .github/env_urls.yaml)
+            echo "AEM_HOST=$url" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST::$url"
+          elif [[ "$environment" == *"prod"* ]] && [[ "$environment" != *"live"* ]]; then
+            url1=$(awk -F": " '/Lob-Prod:/{print $2}' .github/env_urls.yaml)
+            url2=$(awk -F": " '/Lob-Prod-preview:/{print $2}' .github/env_urls.yaml)
+            echo "AEM_HOST=$url1,$url2" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST::$url1,$url2"
+          else
+            url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} $1 ~ "^ *"env"$" {gsub(/^ *| *$/, "", $2); print $2}' .github/env_urls.yaml)
+            if [ -z "$url" ]; then
+              echo "Invalid environment: $environment"
+              exit 1
+            fi
+            echo "AEM_HOST=$url" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST::$url"
           fi
-          echo "AEM_HOST=$url" >> $GITHUB_ENV
-          echo "::set-output name=AEM_HOST::$url"
 
       - name: Set AEM Credentials
         id: set-credentials
@@ -71,8 +83,6 @@ jobs:
         with:
           name: package
           path: we.retail.community.apps-1.11.84.zip
-
-    
 
   upload-aem-package:
     needs: validate-and-deploy
