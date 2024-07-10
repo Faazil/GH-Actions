@@ -12,8 +12,9 @@ jobs:
   validate-and-deploy:
     runs-on: rhel999
     outputs:
-      AEM_HOST: ${{ steps.extract_url.outputs.AEM_AUTHOR_URL }}
-      AEM_PREVIEW_URL: ${{ steps.extract_url.outputs.AEM_PREVIEW_URL }}
+      AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
+      AEM_HOST_AUTHOR: ${{ steps.extract_url.outputs.AEM_HOST_AUTHOR }}
+      AEM_HOST_PREVIEW: ${{ steps.extract_url.outputs.AEM_HOST_PREVIEW }}
       AEM_CREDENTIALS: ${{ steps.set-credentials.outputs.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: ${{ steps.set-package-name.outputs.AEM_PACKAGE_NAME }}
     steps:
@@ -51,34 +52,27 @@ jobs:
           echo "Extracting URL for environment: $environment" # Debugging step
 
           if [[ "$environment" == *"prod-live"* ]]; then
-            author_url=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
-            preview_url=""
-            echo "Prod-live environment detected, Author URL: $author_url, No Preview URL" # Debugging step
-            echo "AEM_AUTHOR_URL=$author_url" >> $GITHUB_ENV
-            echo "AEM_PREVIEW_URL=$preview_url" >> $GITHUB_ENV
-            echo "::set-output name=AEM_AUTHOR_URL::$author_url"
-            echo "::set-output name=AEM_PREVIEW_URL::$preview_url"
+            url=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
+            echo "Prod-live environment detected, URL: $url" # Debugging step
+            echo "AEM_HOST_AUTHOR=$url" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST_AUTHOR::$url"
           elif [[ "$environment" == *"prod"* ]] && [[ "$environment" != *"live"* ]]; then
-            author_url=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
-            preview_url=$(awk -F": " '/ess-prod-preview:/{print $2}' .github/env_urls.yaml)
-            echo "Prod environment detected, Author URL: $author_url, Preview URL: $preview_url" # Debugging step
-            echo "AEM_AUTHOR_URL=$author_url" >> $GITHUB_ENV
-            echo "AEM_PREVIEW_URL=$preview_url" >> $GITHUB_ENV
-            echo "::set-output name=AEM_AUTHOR_URL::$author_url"
-            echo "::set-output name=AEM_PREVIEW_URL::$preview_url"
+            url_author=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
+            url_preview=$(awk -F": " '/ess-prod-preview:/{print $2}' .github/env_urls.yaml)
+            echo "Prod environment detected, URLs: $url_author, $url_preview" # Debugging step
+            echo "AEM_HOST_AUTHOR=$url_author" >> $GITHUB_ENV
+            echo "AEM_HOST_PREVIEW=$url_preview" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST_AUTHOR::$url_author"
+            echo "::set-output name=AEM_HOST_PREVIEW::$url_preview"
           else
             url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} {if(tolower($1) == tolower(env)) {gsub(/^ *| *$/, "", $2); print $2}}' .github/env_urls.yaml)
-            author_url=$url
-            preview_url=""
             echo "General environment detected, URL: $url" # Debugging step
             if [ -z "$url" ]; then
               echo "Invalid environment: $environment"
               exit 1
             fi
-            echo "AEM_AUTHOR_URL=$author_url" >> $GITHUB_ENV
-            echo "AEM_PREVIEW_URL=$preview_url" >> $GITHUB_ENV
-            echo "::set-output name=AEM_AUTHOR_URL::$author_url"
-            echo "::set-output name=AEM_PREVIEW_URL::$preview_url"
+            echo "AEM_HOST=$url" >> $GITHUB_ENV
+            echo "::set-output name=AEM_HOST::$url"
           fi
 
       - name: Set AEM Credentials
@@ -89,10 +83,8 @@ jobs:
         id: set-package-name
         run: echo "::set-output name=AEM_PACKAGE_NAME::we.retail.community.apps-1.11.84.zip"
 
-      - name: Check variables
-        run: |
-          echo "AEM_AUTHOR_URL: $AEM_AUTHOR_URL"
-          echo "AEM_PREVIEW_URL: $AEM_PREVIEW_URL"
+      - name: Check variable
+        run: echo $AEM_HOST
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v2
@@ -106,5 +98,6 @@ jobs:
     with:
       AEM_CREDENTIALS: ${{ needs.validate-and-deploy.outputs.AEM_CREDENTIALS }}
       AEM_PACKAGE_NAME: ${{ needs.validate-and-deploy.outputs.AEM_PACKAGE_NAME }}
-      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_AUTHOR_URL }}
-      AEM_PREVIEW_URL: ${{ needs.validate-and-deploy.outputs.AEM_PREVIEW_URL }}
+      AEM_HOST: ${{ needs.validate-and-deploy.outputs.AEM_HOST }}
+      AEM_HOST_AUTHOR: ${{ needs.validate-and-deploy.outputs.AEM_HOST_AUTHOR }}
+      AEM_HOST_PREVIEW: ${{ needs.validate-and-deploy.outputs.AEM_HOST_PREVIEW }}
