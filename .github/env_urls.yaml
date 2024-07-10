@@ -11,3 +11,5 @@ dns_file:
   3test: http://localhost:4706
   3prod: http://localhost:4708
   3loc: http://localhost:4502
+  Lob-Prod : http://localhost:6666
+  Lob-Prod-preview: http://localhost:7777
