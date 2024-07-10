@@ -5,6 +5,8 @@ environments:
      - 1test
      - 1prod
      - 1loc
-     - Lob-Prod
-     - Lob-Prod-live
+     - ess-Prod
+     - fis-Prod-live
+
+
   
