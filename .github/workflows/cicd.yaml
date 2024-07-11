@@ -68,9 +68,8 @@ jobs:
             echo "::set-output name=AEM_HOST_PREVIEW::$url_preview"
           else
             echo "Attempting to extract URL for non-prod environment..."
-            cat .github/env_urls.yaml
             url=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} /dns_file:/ {next} {if(tolower($1) == tolower(env)) {gsub(/^ *| *$/, "", $2); print $2}}' .github/env_urls.yaml)
-            echo "Extracted URL: $url" # Debugging step
+            echo "Extracted URL using awk: $url" # Debugging step
             if [ -z "$url" ]; then
               echo "Invalid environment: $environment"
               exit 1
