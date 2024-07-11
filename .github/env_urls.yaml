@@ -2,7 +2,7 @@ dns_file:
   1eng: http://localhost:4504
   1test: http://localhost:4506
   1prod: http://localhost:4508
-  1loc: http://localhost:4502
+  1Loc: http://localhost:4502
   2eng: http://localhost:4604
   2test: http://localhost:4606
   2prod: http://localhost:4608
