@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-deploy:
-    runs-on: RHEL8-01
+    runs-on: rhel999
     outputs:
       AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
       AEM_HOST_AUTHOR: ${{ steps.extract_url.outputs.AEM_HOST_AUTHOR }}
