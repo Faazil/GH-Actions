@@ -8,6 +8,8 @@ environments:
      - 2loc
      - ess-Prod
      - ess-Prod-live
+     - fis-Prod
+     - fis-Prod-live
 
 
   
