@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-deploy:
-    runs-on: RHEL8-01
+    runs-on: rhel999
     outputs:
       AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
       AEM_HOST_AUTHOR: ${{ steps.extract_url.outputs.AEM_HOST_AUTHOR }}
@@ -44,6 +44,7 @@ jobs:
             echo "env_urls.yaml not found in the repository."
             exit 1
           fi
+          cat .github/env_urls.yaml
 
       - name: Extract Environment URL
         id: extract_url
