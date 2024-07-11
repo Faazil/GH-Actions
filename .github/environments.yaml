@@ -5,6 +5,7 @@ environments:
      - 1test
      - 1prod
      - 1loc
+     - 2loc
      - ess-Prod
      - ess-Prod-live
 
