@@ -10,7 +10,7 @@ on:
 
 jobs:
   validate-and-deploy:
-    runs-on: RHEL8-01
+    runs-on: rhel999
     outputs:
       AEM_HOST: ${{ steps.extract_url.outputs.AEM_HOST }}
       AEM_HOST_AUTHOR: ${{ steps.extract_url.outputs.AEM_HOST_AUTHOR }}
@@ -24,9 +24,10 @@ jobs:
       - name: Validate Environment Input
         id: validate
         run: |
-          VALID_ENVIRONMENTS=("1eng" "1test" "1prod" "1loc" "ess-prod" "ess-prod-live")
+          VALID_ENVIRONMENTS=$(awk '/awsAccounts:/{flag=1;next}/type/{flag=0}flag' .github/environments.yaml | sed 's/- //g' | tr '\n' ' ' | tr '[:upper:]' '[:lower:]')
           INPUT_ENVIRONMENT=$(echo "${{ github.event.inputs.environment }}" | tr '[:upper:]' '[:lower:]')
-          if [[ " ${VALID_ENVIRONMENTS[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
+          VALID_ENVIRONMENTS_ARRAY=($VALID_ENVIRONMENTS)
+          if [[ " ${VALID_ENVIRONMENTS_ARRAY[@]} " =~ " ${INPUT_ENVIRONMENT} " ]]; then
             echo "Environment input is valid: ${INPUT_ENVIRONMENT}"
             echo "environment=${INPUT_ENVIRONMENT}" >> $GITHUB_OUTPUT
           else
