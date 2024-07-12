@@ -35,6 +35,14 @@ jobs:
             exit 1
           fi
 
+      - name: Extract LOB
+        id: extract_lob
+        run: |
+          environment=${{ steps.validate.outputs.environment }}
+          LOB=$(awk -v env="$environment" 'BEGIN {FS=": "; OFS=": "} /awsAccounts:/{flag=1;next}/type/{flag=0}flag {print tolower($0)}' .github/environments.yaml | grep -o '^[^0-9]*' | uniq)
+          echo "Extracted LOB: $LOB"
+          echo "lob=$LOB" >> $GITHUB_OUTPUT
+
       - name: Ensure env_urls.yaml is available
         run: |
           if [ ! -f .github/env_urls.yaml ]; then
@@ -46,14 +54,15 @@ jobs:
         id: extract_url
         run: |
           environment=${{ steps.validate.outputs.environment }}
+          lob=${{ steps.extract_lob.outputs.lob }}
           if [[ "$environment" == *"prod-live"* ]]; then
-            url=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
+            url=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod:/{print $2}' .github/env_urls.yaml)
             echo "Prod-live environment detected, URL: $url"
             echo "AEM_HOST_AUTHOR=$url" >> $GITHUB_ENV
             echo "::set-output name=AEM_HOST_AUTHOR::$url"
           elif [[ "$environment" == *"prod"* ]] && [[ "$environment" != *"live"* ]]; then
-            url_author=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
-            url_preview=$(awk -F": " '/ess-prod-preview:/{print $2}' .github/env_urls.yaml)
+            url_author=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod:/{print $2}' .github/env_urls.yaml)
+            url_preview=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod-preview:/{print $2}' .github/env_urls.yaml)
             echo "Prod environment detected, URLs: $url_author, $url_preview"
             echo "AEM_HOST_AUTHOR=$url_author" >> $GITHUB_ENV
             echo "AEM_HOST_PREVIEW=$url_preview" >> $GITHUB_ENV
