@@ -7,10 +7,6 @@ on:
         description: 'Select environment'
         required: true
         default: '1loc'
-      lob:
-        description: 'Select LOB'
-        required: true
-        default: 'ess'
 
 jobs:
   validate-and-deploy:
@@ -50,15 +46,14 @@ jobs:
         id: extract_url
         run: |
           environment=${{ steps.validate.outputs.environment }}
-          lob=${{ github.event.inputs.lob }}
           if [[ "$environment" == *"prod-live"* ]]; then
-            url=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod:/{print $2}' .github/env_urls.yaml)
+            url=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
             echo "Prod-live environment detected, URL: $url"
             echo "AEM_HOST_AUTHOR=$url" >> $GITHUB_ENV
             echo "::set-output name=AEM_HOST_AUTHOR::$url"
           elif [[ "$environment" == *"prod"* ]] && [[ "$environment" != *"live"* ]]; then
-            url_author=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod:/{print $2}' .github/env_urls.yaml)
-            url_preview=$(awk -v lob="$lob" -F": " '/^ *"lob"-prod-preview:/{print $2}' .github/env_urls.yaml)
+            url_author=$(awk -F": " '/ess-prod:/{print $2}' .github/env_urls.yaml)
+            url_preview=$(awk -F": " '/ess-prod-preview:/{print $2}' .github/env_urls.yaml)
             echo "Prod environment detected, URLs: $url_author, $url_preview"
             echo "AEM_HOST_AUTHOR=$url_author" >> $GITHUB_ENV
             echo "AEM_HOST_PREVIEW=$url_preview" >> $GITHUB_ENV
