@@ -6,10 +6,9 @@ environments:
      - 1prod
      - 1loc
      - 2loc
-     - ess-Prod-preview
-     - ess-Prod-live
-     - fis-Prod-preview
-     - fis-Prod-live
+     - ttt-Prod-preview
+     - ttt-Prod-live
+     
 
 
   
