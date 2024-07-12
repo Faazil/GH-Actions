@@ -6,7 +6,7 @@ environments:
      - 1prod
      - 1loc
      - 2loc
-     - ttt-Prod-preview
+     - ttt-Prod
      - ttt-Prod-live
      
 
